@@ -1,30 +1,50 @@
 using UnityEngine;
-using TMPro; // Necessário para usar o TextMeshPro
+using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
-    public TextMeshProUGUI textoPontuacao; // Arraste seu texto aqui no Inspector
+    public TextMeshProUGUI textoPontuacao;
+    public TextMeshProUGUI textoRecorde; // campo para mostrar o High Score
+    
     private float tempoDecorrido = 0f;
     private bool jogoAtivo = true;
+
+    void Start()
+    {
+        // Ao começar, carrega o recorde salvo. Se não houver nada, o padrão é 0.
+        float recordeSalvo = PlayerPrefs.GetFloat("HighScore", 0);
+        textoRecorde.text = "Recorde: " + recordeSalvo.ToString("0");
+    }
 
     void Update()
     {
         if (jogoAtivo)
         {
-            // Soma o tempo que passou desde o último frame
             tempoDecorrido += Time.deltaTime;
-
-            // Formata o tempo para aparecer sem as casas decimais (ou como preferir)
-            // "0" significa número inteiro. "F2" mostraria 2 casas decimais.
             textoPontuacao.text = "Pontos: " + tempoDecorrido.ToString("0");
         }
     }
 
-    // Função para parar o contador quando o player morrer, por exemplo
     public void PararCronometro()
     {
         jogoAtivo = false;
+        VerificarRecorde();
     }
 
-    
+    void VerificarRecorde()
+    {
+        float recordeAtual = PlayerPrefs.GetFloat("HighScore", 0);
+
+        // Se a pontuação de agora for maior que o recorde salvo...
+        if (tempoDecorrido > recordeAtual)
+        {
+            // Salva o novo valor!
+            PlayerPrefs.SetFloat("HighScore", tempoDecorrido);
+            
+            PlayerPrefs.Save(); // Garante que foi escrito no disco
+            
+            textoRecorde.text = "Novo Recorde: " + tempoDecorrido.ToString("0");
+            Debug.Log("Novo Recorde Salvo!");
+        }
+    }
 }
