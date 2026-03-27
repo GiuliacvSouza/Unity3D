@@ -10,6 +10,8 @@ public class PlayerJump : MonoBehaviour
     private int pulosFeitos = 0;
     private bool estaNoChao;
 
+    public ScoreManager scoreManager;
+    
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -44,6 +46,7 @@ public class PlayerJump : MonoBehaviour
         estaNoChao = false;
     }
 
+    
     private void OnCollisionEnter(Collision collision)
     {
         // Quando encosta no chão, reseta o contador
@@ -52,5 +55,16 @@ public class PlayerJump : MonoBehaviour
             estaNoChao = true;
             pulosFeitos = 0;
         }
+
+        // Se bater no OBSTÁCULO
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Game Over!");
+            scoreManager.PararCronometro(); // Avisa o outro script para parar!
+            this.enabled = false; // Desativa o movimento do player
+        }
     }
+
+
+    
 }
