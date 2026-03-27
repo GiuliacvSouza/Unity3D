@@ -4,23 +4,25 @@ public class ObstacleSpawner : MonoBehaviour
 {
     [Header("Configurações")]
     public GameObject obstaclePrefab;
-    public float spawnInterval = 2.0f; // Tempo entre cada obstáculo
-    public float laneDistance = 3.0f; // Deve ser igual à do PlayerController
-    public float spawnXDistance = 20.0f; // Quão longe na frente do player ele surge
+    public float spawnInterval = 2.0f;
+    public float laneDistance = 3.0f;
+    public float spawnXDistance = 40.0f;
+    public float obstacleSpeed = 5.0f; // <--- NOVA VARIÁVEL APARECERÁ NO PAINEL
+
+    [Header("Posicionamento")]
+    public float spawnHeight = 1.5f; // Para você mudar o Y pelo painel também
 
     private float timer;
     private float initialZ;
 
     void Start()
     {
-        // Captura o Z inicial (mesma lógica do player)
         initialZ = transform.position.z;
     }
 
     void Update()
     {
         timer += Time.deltaTime;
-
         if (timer >= spawnInterval)
         {
             SpawnObstacle();
@@ -30,13 +32,23 @@ public class ObstacleSpawner : MonoBehaviour
 
     void SpawnObstacle()
     {
-        // Escolhe uma das 3 faixas (-1, 0, 1) aleatoriamente
         int randomLane = Random.Range(-1, 2);
         float targetZ = initialZ + (randomLane * laneDistance);
 
-        // Define a posição de spawn (X na frente, Z na faixa sorteada)
-        Vector3 spawnPos = new Vector3(transform.position.x + spawnXDistance, 1.5f, targetZ);
+        // Define a posição usando a variável de altura
+        Vector3 spawnPos = new Vector3(transform.position.x + spawnXDistance, spawnHeight, targetZ);
 
-        Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+        // Criamos o objeto e guardamos uma referência a ele na variável 'go'
+        GameObject go = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+
+        // AQUI ESTÁ O SEGREDO:
+        // Pegamos o script 'Obstacle' que está dentro do cubo que acabou de nascer
+        Obstacle scriptDoObstaculo = go.GetComponent<Obstacle>();
+
+        if (scriptDoObstaculo != null)
+        {
+            // E passamos a velocidade do Spawner para o Obstáculo
+            scriptDoObstaculo.speed = obstacleSpeed;
+        }
     }
 }
