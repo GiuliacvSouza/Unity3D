@@ -18,11 +18,12 @@ public class Obstacle : MonoBehaviour
         transform.Translate(Vector3.left * speed * Time.deltaTime);
     }
 
+    // logica de fim de jogo removida daqui
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            Debug.Log("O Obstáculo detectou o Player, mas quem manda é o GameManager.");
         }
     }
 }

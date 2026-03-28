@@ -47,4 +47,9 @@ public class ScoreManager : MonoBehaviour
             Debug.Log("Novo Recorde Salvo!");
         }
     }
+
+   public string PegarPontuacaoFormatada()
+   {
+    return tempoDecorrido.ToString("0");
+    }
 }

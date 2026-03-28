@@ -2,20 +2,24 @@ using UnityEngine;
 
 public class PlayerCollision : MonoBehaviour
 {
-    public ScoreManager scoreManager; 
+    private GameManager gameManager; 
+
+    void Start()
+    {
+        // Padrão Unity 6
+        gameManager = Object.FindFirstObjectByType<GameManager>();
+    }
 
     private void OnTriggerEnter(Collider other) 
     {
         if (other.CompareTag("Obstacle"))
         {
-            Debug.Log("TRIGGER ATIVADO! Batemos no obstáculo.");
-
-            if (scoreManager != null)
+            if (gameManager != null)
             {
-                scoreManager.PararCronometro();
+                gameManager.AcionarGameOver();
             }
 
-            // Para o movimento do player
+            // Desativa o movimento para a bola não continuar andando no fundo
             if (GetComponent<PlayerController>() != null)
             {
                 GetComponent<PlayerController>().enabled = false;
