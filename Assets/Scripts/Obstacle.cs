@@ -1,29 +1,26 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Obstacle : MonoBehaviour
 {
-    // Coloque aqui a MESMA velocidade que está no seu GroundManager (ex: 5)
-    public float speed = 5f;
-    public float lifeTime = 10f;
+    public float speed; // Recebe valor do Spawner
+    private Transform player;
 
     void Start()
     {
-        Destroy(gameObject, lifeTime);
+        // Encontra o Player na cena
+        player = Object.FindFirstObjectByType<PlayerController>().transform;
     }
 
     void Update()
     {
-        // O chão move para a esquerda (Vector3.left), o obstáculo também deve mover!
+        // 1. Movimentação (indo para a esquerda)
         transform.Translate(Vector3.left * speed * Time.deltaTime);
-    }
 
-    // logica de fim de jogo removida daqui
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
+        // 2. Destruição por distância
+        // Se o player passou pelo cubo e o cubo ficou 15 metros para trás:
+        if (player != null && transform.position.x < player.position.x - 15f)
         {
-            Debug.Log("O Obstáculo detectou o Player, mas quem manda é o GameManager.");
+            Destroy(gameObject);
         }
     }
 }
