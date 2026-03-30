@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections; // necessário para IEnumerator
+
 
 // Gerencia toda a UI do jogo: pontuação, recorde, painéis de menu e game over
 public class ScoreManager : MonoBehaviour
@@ -9,6 +11,7 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI textoPontuacao;       // Texto da pontuação em tempo real
     public TextMeshProUGUI textoRecorde;         // Texto do recorde salvo
     public TextMeshProUGUI textoPontuacaoFinal;  // Texto exibido no painel de game over
+    public TextMeshProUGUI textoContagem;        // Texto exibido ao iniciar o jogo
 
     [Header("Paineis de UI")]
     public GameObject PainelMenu;       // Painel do menu inicial (botão Jogar)
@@ -37,6 +40,9 @@ public class ScoreManager : MonoBehaviour
         float recordeSalvo = PlayerPrefs.GetFloat("HighScore", 0);
         textoRecorde.text = "Recorde: " + recordeSalvo.ToString("0");
 
+        // Garante que o texto de contagem começa invisível
+        if (textoContagem != null) textoContagem.gameObject.SetActive(false);
+
         // Garante que ambos os painéis começam ocultos
         PainelMenu.SetActive(false);
         PainelGameOver.SetActive(false);
@@ -45,6 +51,8 @@ public class ScoreManager : MonoBehaviour
         {
             // Veio do botão Reiniciar: reseta a flag e começa o jogo direto
             veioDoReiniciar = false;
+            // Ao reiniciar, vai direto para a contagem sem mostrar o menu
+            StartCoroutine(ContagemRegressiva());
             IniciarJogo();
         }
         else
@@ -65,14 +73,44 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    // Chamado pelo botão Jogar no menu inicial
+   // Chamado pelo botão Jogar — agora inicia a contagem em vez de começar direto
     public void IniciarJogo()
     {
-        Time.timeScale = 1;
-        jogoAtivo = true;
         PainelMenu.SetActive(false);
         PainelGameOver.SetActive(false);
+        StartCoroutine(ContagemRegressiva());
     }
+
+     // Coroutine da contagem regressiva
+    private IEnumerator ContagemRegressiva()
+    {
+        // O jogo continua pausado durante a contagem
+        Time.timeScale = 0;
+
+        if (textoContagem != null)
+        {
+            textoContagem.gameObject.SetActive(true);
+
+            textoContagem.text = "3";
+            yield return new WaitForSecondsRealtime(1f); // WaitForSecondsRealtime ignora o timeScale
+
+            textoContagem.text = "2";
+            yield return new WaitForSecondsRealtime(1f);
+
+            textoContagem.text = "1";
+            yield return new WaitForSecondsRealtime(1f);
+
+            textoContagem.text = "JÁ!";
+            yield return new WaitForSecondsRealtime(0.6f);
+
+            textoContagem.gameObject.SetActive(false);
+        }
+
+        // Só agora libera o jogo de verdade
+        Time.timeScale = 1;
+        jogoAtivo = true;
+    }
+
 
     // Chamado pelo GameManager quando o player colide com um obstáculo
     public void PararCronometro()
