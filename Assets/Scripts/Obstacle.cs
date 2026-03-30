@@ -1,23 +1,25 @@
 using UnityEngine;
 
+// Controla o movimento e destruição de cada obstáculo individualmente
 public class Obstacle : MonoBehaviour
 {
-    public float speed; // Recebe valor do Spawner
+    public float speed; // Velocidade recebida do ObstacleSpawner no momento do spawn
+
     private Transform player;
 
     void Start()
     {
-        // Encontra o Player na cena
+        // Busca o player na cena para calcular distância
         player = Object.FindFirstObjectByType<PlayerController>().transform;
     }
 
     void Update()
     {
-        // 1. Movimentação (indo para a esquerda)
+        // Move o obstáculo para a esquerda
         transform.Translate(Vector3.left * speed * Time.deltaTime);
 
-        // 2. Destruição por distância
-        // Se o player passou pelo cubo e o cubo ficou 15 metros para trás:
+        // Destrói o obstáculo quando ficar 15 unidades atrás do player
+        // evitando acúmulo de objetos invisíveis na cena
         if (player != null && transform.position.x < player.position.x - 15f)
         {
             Destroy(gameObject);

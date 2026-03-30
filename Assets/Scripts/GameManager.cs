@@ -1,47 +1,36 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
+// Gerencia o estado geral do jogo (game over e reinício)
+// Delega toda a lógica de UI e pontuação ao ScoreManager
 public class GameManager : MonoBehaviour
 {
-    [Header("UI do Game Over")]
-    public GameObject painelGameOver; 
-    public TextMeshProUGUI textoPontuacaoFinal;
-
-    private ScoreManager scoreManager; 
+    private ScoreManager scoreManager;
 
     void Start()
     {
-        // Padrão Unity 6 para não dar aviso no console
+        // Busca o ScoreManager na cena (padrão Unity 6)
         scoreManager = Object.FindFirstObjectByType<ScoreManager>();
-        
-        // Garante que o painel comece escondido e o tempo rodando
-        if(painelGameOver != null) painelGameOver.SetActive(false);
-        Time.timeScale = 1; 
     }
 
+    // Chamado quando o player colide com um obstáculo
     public void AcionarGameOver()
     {
-        // 1. Para o tempo e salva o recorde
         if (scoreManager != null)
         {
-            scoreManager.PararCronometro(); 
-            textoPontuacaoFinal.text = "Pontos: " + scoreManager.PegarPontuacaoFormatada();
-        }
-
-        // 2. Pausa o mundo físico
-        Time.timeScale = 0; 
-
-        // 3. Mostra a tela
-        if (painelGameOver != null)
-        {
-            painelGameOver.SetActive(true);
+            // O ScoreManager já cuida de parar o tempo, salvar recorde e mostrar o painel
+            scoreManager.PararCronometro();
         }
     }
 
+    // Chamado pelo botão Reiniciar no painel de Game Over
     public void ReiniciarJogo()
     {
-        Time.timeScale = 1;
+        // Avisa o ScoreManager que a cena foi reiniciada via botão
+        // para que ele pule o menu inicial e comece o jogo direto
+        ScoreManager.veioDoReiniciar = true;
+
+        Time.timeScale = 1; // Garante que o tempo volta antes de recarregar
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

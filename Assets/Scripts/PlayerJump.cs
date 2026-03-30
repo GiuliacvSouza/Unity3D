@@ -1,17 +1,18 @@
 using UnityEngine;
 
+// Controla o pulo simples e o pulo duplo do player
 public class PlayerJump : MonoBehaviour
 {
-    //alterar depois de acordo com os obstaculos
-    public float forcaPulo1 = 6f; // Primeiro pulo
-    public float forcaPulo2 = 9f;   // Segundo pulo (pulo duplo)
-    
-    private Rigidbody rb;
-    private int pulosFeitos = 0;
-    private bool estaNoChao;
+    [Header("Configurações de Pulo")]
+    public float forcaPulo1 = 6f;   // Força do primeiro pulo (do chão)
+    public float forcaPulo2 = 9f;   // Força do segundo pulo (no ar)
 
-    public ScoreManager scoreManager;
-    
+    private Rigidbody rb;
+    private int pulosFeitos = 0;    // Contador de pulos (máximo 2)
+    private bool estaNoChao;        // True quando o player está tocando o chão
+
+    public ScoreManager scoreManager; // Referência para parar o cronômetro em colisão direta
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -19,7 +20,10 @@ public class PlayerJump : MonoBehaviour
 
     void Update()
     {
-        // Se apertar Espaço E (estiver no chão OU ainda tiver o pulo duplo sobrando)
+        // Não processa pulo se o jogo estiver pausado
+        if (Time.timeScale == 0) return;
+
+        // Pula se apertar espaço E estiver no chão OU ainda tiver pulo duplo disponível
         if (Input.GetKeyDown(KeyCode.Space) && (estaNoChao || pulosFeitos < 2))
         {
             Pular();
@@ -28,17 +32,17 @@ public class PlayerJump : MonoBehaviour
 
     void Pular()
     {
-        // Zera a velocidade vertical antes de pular (importante para o pulo duplo ser consistente)
+        // Zera a velocidade vertical para o pulo duplo ter força consistente
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
         if (pulosFeitos == 0)
         {
-            // Primeiro Pulo
+            // Primeiro pulo: força menor (saída do chão)
             rb.AddForce(Vector3.up * forcaPulo1, ForceMode.Impulse);
         }
         else
         {
-            // Segundo Pulo
+            // Segundo pulo: força maior (pulo duplo no ar)
             rb.AddForce(Vector3.up * forcaPulo2, ForceMode.Impulse);
         }
 
@@ -46,25 +50,21 @@ public class PlayerJump : MonoBehaviour
         estaNoChao = false;
     }
 
-    
     private void OnCollisionEnter(Collision collision)
     {
-        // Quando encosta no chão, reseta o contador
+        // Ao tocar o chão, reseta o contador de pulos
         if (collision.gameObject.CompareTag("Ground"))
         {
             estaNoChao = true;
             pulosFeitos = 0;
         }
 
-        // Se bater no OBSTÁCULO
+        // Colisão direta com obstáculo (fallback — o fluxo principal passa pelo PlayerCollision)
         if (collision.gameObject.CompareTag("Obstacle"))
         {
             Debug.Log("Game Over!");
-            scoreManager.PararCronometro(); // Avisa o outro script para parar!
-            this.enabled = false; // Desativa o movimento do player
+            if (scoreManager != null) scoreManager.PararCronometro();
+            this.enabled = false; // Desativa o script de pulo
         }
     }
-
-
-    
 }

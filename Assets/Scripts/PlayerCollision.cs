@@ -1,28 +1,32 @@
 using UnityEngine;
 
+// Detecta colisões do player com obstáculos e aciona o game over
 public class PlayerCollision : MonoBehaviour
 {
-    private GameManager gameManager; 
+    private GameManager gameManager;
 
     void Start()
     {
-        // Padrão Unity 6
+        // Busca o GameManager na cena (padrão Unity 6)
         gameManager = Object.FindFirstObjectByType<GameManager>();
     }
 
-    private void OnTriggerEnter(Collider other) 
+    // Usa Trigger (não Collision) — o Collider do player deve ter "Is Trigger" ativado
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Obstacle"))
         {
+            // Aciona o game over pelo GameManager, que delega ao ScoreManager
             if (gameManager != null)
             {
                 gameManager.AcionarGameOver();
             }
 
-            // Desativa o movimento para a bola não continuar andando no fundo
-            if (GetComponent<PlayerController>() != null)
+            // Desativa o PlayerController para o player parar de se mover após a morte
+            PlayerController controller = GetComponent<PlayerController>();
+            if (controller != null)
             {
-                GetComponent<PlayerController>().enabled = false;
+                controller.enabled = false;
             }
         }
     }
