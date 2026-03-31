@@ -41,11 +41,14 @@ public class GroundManager : MonoBehaviour
         Renderer rend = ground.GetComponent<Renderer>();
         if (rend != null)
         {
-            return rend.bounds.size.x;
+             // bounds.size já considera a escala, mas vamos logar para debugar
+            float length = rend.bounds.size.x;
+            Debug.Log("Ground length calculado: " + length);
+            return length;
         }
 
-        Debug.LogWarning("Ground sem Renderer!");
-        return 10f;
+         Debug.LogWarning("Ground sem Renderer! Usando escala X: " + ground.localScale.x);
+    return ground.localScale.x;
     }
 
     // Move o primeiro segmento para depois do último, criando o efeito de loop infinito

@@ -17,6 +17,13 @@ public class ScoreManager : MonoBehaviour
     public GameObject PainelMenu;       // Painel do menu inicial (botão Jogar)
     public GameObject PainelGameOver;   // Painel de game over (botão Reiniciar)
 
+    [Header("Dificuldade Incremental")]
+    public float velocidadeInicial = 5f;
+    public float velocidadeMaxima = 20f;
+    public float incrementoVelocidade = 0.5f; // aumenta X por segundo
+    public GroundManager groundManager;
+    public ObstacleSpawner obstacleSpawner;
+
     private float tempoDecorrido = 0f;  // Pontuação atual (em segundos)
     private bool jogoAtivo = false;     // Controla se o cronômetro está rodando
 
@@ -70,6 +77,9 @@ public class ScoreManager : MonoBehaviour
         {
             tempoDecorrido += Time.deltaTime;
             textoPontuacao.text = "Pontos: " + tempoDecorrido.ToString("0");
+
+            // Aumenta velocidade gradualmente até ao máximo
+            AtualizarDificuldade();
         }
     }
 
@@ -152,4 +162,27 @@ public class ScoreManager : MonoBehaviour
         Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    void AtualizarDificuldade()
+{
+    float novaVelocidade = Mathf.Min(
+        velocidadeInicial + (tempoDecorrido * incrementoVelocidade),
+        velocidadeMaxima
+    );
+
+    // Sincroniza chão e obstáculos
+    if (groundManager != null)
+        groundManager.speed = novaVelocidade;
+
+    if (obstacleSpawner != null)
+    {
+        obstacleSpawner.obstacleSpeed = novaVelocidade;
+
+        // Reduz intervalo de spawn conforme acelera (min 0.8s)
+        obstacleSpawner.spawnInterval = Mathf.Max(
+            2.0f - (tempoDecorrido * 0.01f),
+            0.8f
+        );
+    }
+}
 }
