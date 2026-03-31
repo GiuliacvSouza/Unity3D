@@ -742,7 +742,7 @@ MonoBehaviour:
   - {fileID: 1244857375}
   - {fileID: 950211930}
   player: {fileID: 678269342}
-  speed: 10
+  speed: 25
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1780,10 +1780,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleSpawner
   obstaclePrefab: {fileID: 6815831772023936727, guid: 0c3167a3d19fa3a4bbbf9a8d4fa9d7b5, type: 3}
-  spawnInterval: 2
+  spawnInterval: 1
   laneDistance: 3
   spawnXDistance: 40
-  obstacleSpeed: 15
+  obstacleSpeed: 25
   spawnHeight: 1.5
 --- !u!4 &1071641400
 Transform:
