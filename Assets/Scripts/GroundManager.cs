@@ -35,20 +35,23 @@ public class GroundManager : MonoBehaviour
         }
     }
 
-    // Retorna o comprimento do segmento via Renderer, com fallback de 10 unidades
+    // Retorna o comprimento do segmento via Renderer, com fallback inteligente
     float GetGroundLength(Transform ground)
     {
         Renderer rend = ground.GetComponent<Renderer>();
+
         if (rend != null)
         {
-             // bounds.size já considera a escala, mas vamos logar para debugar
+
             float length = rend.bounds.size.x;
-            Debug.Log("Ground length calculado: " + length);
+            Debug.Log($"[GroundManager] Ground length: {length}");
             return length;
         }
 
-         Debug.LogWarning("Ground sem Renderer! Usando escala X: " + ground.localScale.x);
-    return ground.localScale.x;
+        float fallback = ground.localScale.x;
+        Debug.LogWarning($"[GroundManager] Sem Renderer, usando scale.x: {fallback}");
+        return fallback;
+
     }
 
     // Move o primeiro segmento para depois do último, criando o efeito de loop infinito
@@ -59,14 +62,12 @@ public class GroundManager : MonoBehaviour
 
         float length = GetGroundLength(firstGround);
 
-        // Reposiciona logo após o último segmento
         firstGround.position = new Vector3(
             lastGround.position.x + length,
             firstGround.position.y,
             firstGround.position.z
         );
 
-        // Atualiza a lista: remove do início e adiciona no fim
         grounds.RemoveAt(0);
         grounds.Add(firstGround);
     }
