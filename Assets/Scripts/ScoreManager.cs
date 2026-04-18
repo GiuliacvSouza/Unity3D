@@ -56,10 +56,7 @@ public class ScoreManager : MonoBehaviour
             tempoDecorrido += Time.deltaTime;
             textoPontuacao.text = "Pontos: " + tempoDecorrido.ToString("0");
 
-<<<<<<< HEAD
-            // Aumenta velocidade gradualmente até ao máximo
-=======
->>>>>>> a17b238 (Velocidade, quebra de chão e camera)
+
             AtualizarDificuldade();
         }
     }
@@ -127,30 +124,7 @@ public class ScoreManager : MonoBehaviour
     }
 
     void AtualizarDificuldade()
-<<<<<<< HEAD
-{
-    float novaVelocidade = Mathf.Min(
-        velocidadeInicial + (tempoDecorrido * incrementoVelocidade),
-        velocidadeMaxima
-    );
 
-    // Sincroniza chão e obstáculos
-    if (groundManager != null)
-        groundManager.speed = novaVelocidade;
-
-    if (obstacleSpawner != null)
-    {
-        obstacleSpawner.obstacleSpeed = novaVelocidade;
-
-        // Reduz intervalo de spawn conforme acelera (min 0.8s)
-        obstacleSpawner.spawnInterval = Mathf.Max(
-            2.0f - (tempoDecorrido * 0.01f),
-            0.8f
-        );
-    }
-}
-}
-=======
     {
         float novaVelocidade = Mathf.Min(
             velocidadeInicial + (tempoDecorrido * incrementoVelocidade),
@@ -171,4 +145,3 @@ public class ScoreManager : MonoBehaviour
         }
     }
 }
->>>>>>> a17b238 (Velocidade, quebra de chão e camera)
