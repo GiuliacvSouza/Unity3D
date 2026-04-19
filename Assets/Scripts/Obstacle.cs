@@ -16,7 +16,7 @@ public class Obstacle : MonoBehaviour
     void Update()
     {
         // Move o obstáculo para a esquerda
-        transform.Translate(Vector3.left * speed * Time.deltaTime);
+        transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
 
         // Destrói o obstáculo quando ficar 15 unidades atrás do player
         // evitando acúmulo de objetos invisíveis na cena

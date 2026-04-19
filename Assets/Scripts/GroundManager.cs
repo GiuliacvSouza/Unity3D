@@ -24,7 +24,7 @@ public class GroundManager : MonoBehaviour
         // Move todos os segmentos para a esquerda
         foreach (Transform ground in grounds)
         {
-            ground.Translate(Vector3.left * speed * Time.deltaTime);
+            ground.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
         }
 
         // Verifica se o primeiro segmento já passou do player
@@ -60,10 +60,17 @@ public class GroundManager : MonoBehaviour
         Transform firstGround = grounds[0];
         Transform lastGround = grounds[grounds.Count - 1];
 
-        float length = GetGroundLength(firstGround);
+        Renderer firstRend = firstGround.GetComponent<Renderer>();
+        Renderer lastRend = lastGround.GetComponent<Renderer>();
+
+        float overlap = 3f; // 👈 controla aqui a sobreposição
+
+        float newX = lastRend.bounds.max.x
+                     + (firstRend.bounds.size.x / 2f)
+                     - overlap;
 
         firstGround.position = new Vector3(
-            lastGround.position.x + length,
+            newX,
             firstGround.position.y,
             firstGround.position.z
         );

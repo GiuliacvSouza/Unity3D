@@ -1,23 +1,34 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-// Spawna obstáculos em intervalos regulares com tendência à faixa do jogador
+[System.Serializable]
+public class ObstacleEntry
+{
+    public GameObject prefab;
+    [Range(0f, 1f)]
+    public float spawnWeight = 1f;
+    public bool occupiesAllLanes = false; // Spawna no centro, ocupa tudo por tamanho
+}
+
 public class ObstacleSpawner : MonoBehaviour
 {
     [Header("Configurações")]
-    public GameObject obstaclePrefab;       // Prefab do obstáculo a ser spawnado
-    public float spawnInterval = 2.0f;      // Tempo em segundos entre cada spawn
-    public float laneDistance = 3.0f;       // Distância entre as faixas no eixo Z
-    public float spawnXDistance = 40.0f;    // Distância à frente do spawner onde o obstáculo aparece
-    public float obstacleSpeed = 5.0f;      // Velocidade passada para cada obstáculo spawnado
+    public List<ObstacleEntry> obstacleTypes = new List<ObstacleEntry>();
+    public float spawnInterval = 2.0f;
+    public float laneDistance = 3.0f;
+    public float spawnXDistance = 40.0f;
+    public float obstacleSpeed = 5.0f;
 
-    [Header("Posicionamento")]
-    public float spawnHeight = 1.5f;        // Altura (eixo Y) em que o obstáculo aparece
+    [Header("Altura e Colisão")]
+    public float raycastHeight = 50f;
+    public float raycastDistance = 100f;
+    public LayerMask groundLayer;
 
     [Header("Referências")]
-    public Transform player;                // Referência ao jogador
+    public Transform player;
 
-    private float timer;    // Acumulador de tempo
-    private float initialZ; // Posição Z inicial do spawner (centro das faixas)
+    private float timer;
+    private float initialZ;
 
     void Start()
     {
@@ -26,7 +37,6 @@ public class ObstacleSpawner : MonoBehaviour
 
     void Update()
     {
-        // Só spawna enquanto o jogo estiver rodando
         if (Time.timeScale > 0)
         {
             timer += Time.deltaTime;
@@ -38,24 +48,55 @@ public class ObstacleSpawner : MonoBehaviour
         }
     }
 
+    ObstacleEntry PickRandomObstacleEntry()
+    {
+        float totalWeight = 0f;
+        foreach (var entry in obstacleTypes)
+            totalWeight += entry.spawnWeight;
+
+        float roll = Random.Range(0f, totalWeight);
+        float cumulative = 0f;
+
+        foreach (var entry in obstacleTypes)
+        {
+            cumulative += entry.spawnWeight;
+            if (roll <= cumulative)
+                return entry;
+        }
+
+        return obstacleTypes[obstacleTypes.Count - 1];
+    }
+
     void SpawnObstacle()
     {
-        // Descobre em qual faixa o jogador está
+        if (obstacleTypes == null || obstacleTypes.Count == 0)
+        {
+            Debug.LogWarning("Nenhum obstáculo configurado!");
+            return;
+        }
+
+        ObstacleEntry chosen = PickRandomObstacleEntry();
+
+        float targetZ = chosen.occupiesAllLanes
+            ? initialZ
+            : GetLaneZ();
+
+        TrySpawnAt(chosen.prefab, targetZ);
+    }
+
+    float GetLaneZ()
+    {
         int playerLane = Mathf.RoundToInt((player.position.z - initialZ) / laneDistance);
         playerLane = Mathf.Clamp(playerLane, -1, 1);
 
         int chosenLane;
-
-        // 70% de chance de spawnar na mesma faixa do jogador
         if (Random.value < 0.7f)
         {
             chosenLane = playerLane;
         }
         else
         {
-            // 30% distribui entre as outras faixas
             int[] lanes = new int[] { -1, 0, 1 };
-
             do
             {
                 chosenLane = lanes[Random.Range(0, lanes.Length)];
@@ -63,21 +104,54 @@ public class ObstacleSpawner : MonoBehaviour
             while (chosenLane == playerLane);
         }
 
-        float targetZ = initialZ + (chosenLane * laneDistance);
+        return initialZ + (chosenLane * laneDistance);
+    }
 
-        Vector3 spawnPos = new Vector3(
+    void TrySpawnAt(GameObject prefab, float targetZ)
+    {
+        Vector3 rayOrigin = new Vector3(
             transform.position.x + spawnXDistance,
-            spawnHeight,
+            raycastHeight,
             targetZ
         );
 
-        // Instancia o obstáculo e passa a velocidade do spawner para ele
-        GameObject go = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
-        Obstacle scriptDoObstaculo = go.GetComponent<Obstacle>();
-
-        if (scriptDoObstaculo != null)
+        RaycastHit hit;
+        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, raycastDistance, groundLayer))
         {
-            scriptDoObstaculo.speed = obstacleSpeed;
+            // Instancia uma única vez
+            GameObject go = Instantiate(prefab);
+
+            float yOffset = 0f;
+            Collider col = go.GetComponent<Collider>();
+
+            if (col != null)
+            {
+                // distância REAL do pivot até a base do collider
+                yOffset = go.transform.position.y - col.bounds.min.y;
+            }
+
+            Vector3 spawnPos = new Vector3(
+                rayOrigin.x,
+                hit.point.y + yOffset,
+                targetZ
+            );
+
+            go.transform.position = spawnPos;
+
+            // Mantém rotação original + adapta ao terreno
+            Quaternion groundRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+            go.transform.rotation = groundRotation * prefab.transform.rotation;
+
+            // Aplica velocidade
+            Obstacle obstacleScript = go.GetComponent<Obstacle>();
+            if (obstacleScript != null)
+            {
+                obstacleScript.speed = obstacleSpeed;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Raycast não encontrou chão na faixa Z={targetZ}!");
         }
     }
 }

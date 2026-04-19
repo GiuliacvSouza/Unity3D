@@ -1,18 +1,21 @@
 using UnityEngine;
 
-// Controla o pulo simples e o pulo duplo do player
 public class PlayerJump : MonoBehaviour
 {
-    [Header("Configurações de Pulo")]
-    public float forcaPulo1 = 6f;
-    public float forcaPulo2 = 9f;
+    [Header("Pulo")]
+    public float jumpBaseForce = 6f;
+    public float extraHeightMultiplier = 1.2f;
 
-    [Header("Formato do Pulo")]
-    public float fallMultiplier = 3f;   // Quanto maior, mais curto o pulo
-    public float maxFallSpeed = -25f;   // Limite da queda (evita absurdos)
+    [Header("Detecção")]
+    public float detectionDistance = 10f;
+    public float rayHeight = 1f;
+    public LayerMask obstacleLayer;
+
+    [Header("Gravidade")]
+    public float fallMultiplier = 3f;
+    public float maxFallSpeed = -25f;
 
     private Rigidbody rb;
-    private int pulosFeitos = 0;
     private bool estaNoChao;
 
     public ScoreManager scoreManager;
@@ -26,40 +29,52 @@ public class PlayerJump : MonoBehaviour
     {
         if (Time.timeScale == 0) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) && (estaNoChao || pulosFeitos < 2))
+        if (Input.GetKeyDown(KeyCode.Space) && estaNoChao)
         {
-            Pular();
+            PularAdaptativo();
         }
 
         AplicarGravidadeAjustada();
     }
 
-    void Pular()
+    void PularAdaptativo()
     {
-        // Mantém consistência do pulo (importantíssimo pro design)
+        float jumpForce = jumpBaseForce;
+
+        // Origem do raycast (um pouco acima do chão)
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(origin, Vector3.forward, out hit, detectionDistance, obstacleLayer))
+        {
+            // Tenta pegar a altura do obstáculo
+            Renderer rend = hit.collider.GetComponent<Renderer>();
+
+            if (rend != null)
+            {
+                float obstacleHeight = rend.bounds.size.y;
+
+                // Ajusta força baseada na altura
+                jumpForce = Mathf.Max(jumpBaseForce, obstacleHeight * extraHeightMultiplier);
+            }
+        }
+
+        // Limpa velocidade vertical
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
-        if (pulosFeitos == 0)
-        {
-            rb.AddForce(Vector3.up * forcaPulo1, ForceMode.Impulse);
-        }
-        else
-        {
-            rb.AddForce(Vector3.up * forcaPulo2, ForceMode.Impulse);
-        }
+        // Aplica pulo
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-        pulosFeitos++;
         estaNoChao = false;
     }
 
     void AplicarGravidadeAjustada()
     {
-        // Só altera a DESCIDA → mantém altura do pulo
         if (rb.linearVelocity.y < 0)
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
 
-            // Clamp da velocidade de queda
             if (rb.linearVelocity.y < maxFallSpeed)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, maxFallSpeed, rb.linearVelocity.z);
@@ -72,13 +87,15 @@ public class PlayerJump : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             estaNoChao = true;
-            pulosFeitos = 0;
         }
 
         if (collision.gameObject.CompareTag("Obstacle"))
         {
             Debug.Log("Game Over!");
-            if (scoreManager != null) scoreManager.PararCronometro();
+
+            if (scoreManager != null)
+                scoreManager.PararCronometro();
+
             this.enabled = false;
         }
     }

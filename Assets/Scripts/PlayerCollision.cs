@@ -12,17 +12,15 @@ public class PlayerCollision : MonoBehaviour
     }
 
     // Usa Trigger (não Collision) — o Collider do player deve ter "Is Trigger" ativado
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.CompareTag("Obstacle"))
+        if (collision.gameObject.CompareTag("Obstacle"))
         {
-            // Aciona o game over pelo GameManager, que delega ao ScoreManager
             if (gameManager != null)
             {
                 gameManager.AcionarGameOver();
             }
 
-            // Desativa o PlayerController para o player parar de se mover após a morte
             PlayerController controller = GetComponent<PlayerController>();
             if (controller != null)
             {
