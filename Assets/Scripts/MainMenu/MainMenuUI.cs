@@ -5,12 +5,22 @@ public class MainMenuUI : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("SampleScene"); // nome da tua cena do jogo
+        SceneManager.LoadScene("SampleScene"); // nome da cena de jogo
+    }
+
+    public void MenuGame()
+    {
+        SceneManager.LoadScene("MainMenu"); // nome da cena de Main Menu
+    }
+
+    public void ConfigGame()
+    {
+        SceneManager.LoadScene("PageConfig"); // nome da cena de configuração
     }
 
     public void OpenAbout()
     {
-        SceneManager.LoadScene("About");
+        SceneManager.LoadScene("About"); // nome da cena de Sobre
     }
 
     public void QuitGame()
