@@ -32,6 +32,13 @@ public class PlayerJump : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && estaNoChao)
         {
             PularAdaptativo();
+
+            if(AudioManager.Instance != null)
+            {
+                AudioManager.Instance.TocarPulo();
+            } else{
+                Debug.LogWarning("AudioManager não encontrado! Som de pulo não tocou.");
+            }
         }
 
         AplicarGravidadeAjustada();
@@ -92,6 +99,12 @@ public class PlayerJump : MonoBehaviour
         if (collision.gameObject.CompareTag("Obstacle"))
         {
             Debug.Log("Game Over!");
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.TocarGameOver();
+            }
+
 
             if (scoreManager != null)
                 scoreManager.PararCronometro();

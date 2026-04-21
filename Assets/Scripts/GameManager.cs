@@ -18,6 +18,17 @@ public class GameManager : MonoBehaviour
     {
         if (scoreManager != null)
         {
+            
+             if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.TocarGameOver();
+                AudioManager.Instance.PararMusica();
+            }
+            else
+            {
+                Debug.LogWarning("AudioManager não encontrado! Som de Game Over não tocou.");
+            }
+
             // O ScoreManager já cuida de parar o tempo, salvar recorde e mostrar o painel
             scoreManager.PararCronometro();
         }
@@ -31,6 +42,11 @@ public class GameManager : MonoBehaviour
         ScoreManager.veioDoReiniciar = true;
 
         Time.timeScale = 1; // Garante que o tempo volta antes de recarregar
+                
+        if (AudioManager.Instance != null){
+            AudioManager.Instance.RetomarMusica();
+        }
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

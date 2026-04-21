@@ -14,8 +14,20 @@ public class MenuButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public Color textHighlightColor = Color.white; // No seu caso, branco
     public Color boxHighlightColor; // Cor do texto original que irá para o fundo
 
+    [Header("Som do Clique")]
+    public AudioClip somClique;   
+
+    private Button button; 
+
     void Start()
     {
+        button = GetComponent<Button>();
+
+         if (button != null)
+        {
+            button.onClick.AddListener(TocarSomClique);
+        }
+
         // Garante que o fundo comece invisível, mas o texto visível
         if (backgroundBox != null)
         {
@@ -31,6 +43,16 @@ public class MenuButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExi
             buttonText.color = c;
         }
     }
+
+    void TocarSomClique()
+    {
+        Debug.Log("OnClick nativo disparou!");
+        if (AudioManager.Instance != null && somClique != null)
+            AudioManager.Instance.TocarSFX(somClique);
+        else
+            Debug.LogWarning("AudioManager null ou somClique não atribuído!");
+    }
+
 
     // Quando o mouse ENTRA no botão
     public void OnPointerEnter(PointerEventData eventData)
@@ -62,4 +84,5 @@ public class MenuButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExi
             backgroundBox.canvasRenderer.SetAlpha(0.0f);
         }
     }
+
 }
