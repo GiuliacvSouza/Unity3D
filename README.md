@@ -3,6 +3,8 @@ Jennifer Silva, 31086
 Giulia Souza, 27553
 
 # Unity 3D - Trilha na Floresta
+<img width="1756" height="974" alt="Captura de ecrã 2026-04-24 190633" src="https://github.com/user-attachments/assets/23da38a6-141f-43ad-adc9-9e0d1e2e1bce" />
+
 ## Versão do Unity
 - **Unity**: 6000.3.9f1
 
