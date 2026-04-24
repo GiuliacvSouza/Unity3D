@@ -881,6 +881,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1085417436}
   - component: {fileID: 1085417435}
+  - component: {fileID: 1085417437}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -1002,6 +1003,24 @@ Transform:
   - {fileID: 1454184804}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1085417437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085417434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f2577efc31bab43a3830e0b8b61f78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  musicSource: {fileID: 1454184805}
+  sfxSource: {fileID: 1094427653}
+  musicaFloresta: {fileID: 8300000, guid: bea93a38b71b64b598109b3a3b1a0048, type: 3}
+  sfxPulo: {fileID: 8300000, guid: ab792a8791697cd4791b4a1bf5bf87af, type: 3}
+  sfxGameOver: {fileID: 8300000, guid: 32966f220a3e36848b62fa1751c0756b, type: 3}
+  sfxBotao: {fileID: 8300000, guid: ddf594c111764824f99889e6f69683b1, type: 3}
 --- !u!1 &1094427651
 GameObject:
   m_ObjectHideFlags: 0
