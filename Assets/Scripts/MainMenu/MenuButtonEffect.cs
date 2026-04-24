@@ -11,7 +11,7 @@ public class MenuButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [Header("Configurações de Cores")]
     public Color textNormalColor = Color.white;
-    public Color textHighlightColor = Color.white; // No seu caso, branco
+    public Color textHighlightColor = Color.white; // Branco
     public Color boxHighlightColor; // Cor do texto original que irá para o fundo
 
     [Header("Som do Clique")]

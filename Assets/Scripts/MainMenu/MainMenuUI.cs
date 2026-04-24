@@ -13,11 +13,6 @@ public class MainMenuUI : MonoBehaviour
         SceneManager.LoadScene("MainMenu"); // nome da cena de Main Menu
     }
 
-    public void ConfigGame()
-    {
-        SceneManager.LoadScene("PageConfig"); // nome da cena de configuração
-    }
-
     public void OpenAbout()
     {
         SceneManager.LoadScene("About"); // nome da cena de Sobre
