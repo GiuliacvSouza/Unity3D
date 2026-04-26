@@ -136,9 +136,6 @@ O projeto está organizado em **cenas** e **scripts C# (MonoBehaviours)** que im
   3. No menu, iniciar o jogo (Play) para ir para `SampleScene`
 
 ## Assets multimédia
-- ## Vídeo de demonstração
-- [Abrir/transferir o vídeo (`.mp4`)](./Grava%C3%A7%C3%A3o%202026-04-24%20191902.mp4)
-
 - SimpleNaturePack: Unity Store
 
 - **Áudio**:
